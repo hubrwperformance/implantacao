@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Implantação Kommo — RW Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rw-red: #E8003D;
+    --rw-dark-red: #A8002B;
+    --rw-black: #0D0D0D;
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --surface: #F7F7F5;
+    --surface2: #EFEFEC;
+    --border: rgba(13,13,13,0.1);
+    --border2: rgba(13,13,13,0.18);
+    --text: #0D0D0D;
+    --text2: #555550;
+    --text3: #999990;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--rw-black);
+    padding: 0 32px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-logo {
+    width: 28px;
+    height: 28px;
+    background: var(--rw-red);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .header-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    letter-spacing: 0.01em;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 300;
+  }
+  .header-save {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .save-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* CLIENT SELECTOR */
+  .client-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .client-bar label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .client-select-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+  .client-select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    pointer-events: none;
+    font-size: 12px;
+  }
+  select {
+    appearance: none;
+    width: 100%;
+    padding: 9px 36px 9px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: white;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+  }
+  select:focus { border-color: var(--rw-red); }
+
+  .btn-add {
+    padding: 9px 16px;
+    border-radius: var(--radius);
+    border: 1px dashed var(--border2);
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-add:hover { border-color: var(--rw-red); color: var(--rw-red); background: #fff5f7; }
+
+  /* ADD CLIENT MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,13,13,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    width: 340px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 16px; }
+  .modal input {
+    width: 100%;
+    padding: 9px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    margin-bottom: 12px;
+  }
+  .modal input:focus { border-color: var(--rw-red); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .btn-cancel {
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: transparent;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--text2);
+  }
+  .btn-confirm {
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--rw-red);
+    color: white;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* PROGRESS HERO */
+  .progress-hero {
+    background: var(--rw-black);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .pct-circle {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    flex-shrink: 0;
+  }
+  .pct-circle svg { transform: rotate(-90deg); }
+  .pct-circle-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .pct-num { font-size: 22px; font-weight: 600; color: white; line-height: 1; }
+  .pct-sym { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .hero-right { flex: 1; min-width: 180px; }
+  .hero-client { font-size: 20px; font-weight: 500; color: white; margin-bottom: 6px; }
+  .hero-sub { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 16px; }
+  .stats-row { display: flex; gap: 20px; }
+  .stat { }
+  .stat-num { font-size: 18px; font-weight: 500; color: white; }
+  .stat-lbl { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* BLOCKS */
+  .block {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .block:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .block-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    cursor: pointer;
+    gap: 14px;
+    user-select: none;
+  }
+  .block-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .block-info { flex: 1; }
+  .block-title { font-size: 14px; font-weight: 500; color: var(--text); }
+  .block-count { font-size: 12px; color: var(--text3); margin-top: 1px; }
+  .block-right { display: flex; align-items: center; gap: 12px; }
+  .mini-bar-wrap { width: 80px; }
+  .mini-bar-bg { height: 4px; background: var(--surface2); border-radius: 99px; }
+  .mini-bar-fill { height: 4px; border-radius: 99px; background: var(--green); transition: width 0.3s; }
+  .block-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green);
+    min-width: 38px;
+    text-align: right;
+  }
+  .block-pct.zero { color: var(--text3); }
+  .chevron {
+    color: var(--text3);
+    font-size: 11px;
+    transition: transform 0.2s;
+  }
+  .chevron.open { transform: rotate(90deg); }
+
+  .block-items { display: none; border-top: 1px solid var(--border); }
+  .block-items.open { display: block; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 18px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border-bottom: 1px solid var(--border);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: var(--surface); }
+  .check-box {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    background: white;
+    transition: all 0.15s;
+  }
+  .check-item.done .check-box {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .checkmark { display: none; }
+  .check-item.done .checkmark { display: block; }
+  .check-item.done .item-label {
+    text-decoration: line-through;
+    color: var(--text3);
+  }
+  .item-label { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .item-note { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--rw-black);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .footer-left { width: 50%; background: var(--rw-dark-red); position: absolute; left: 0; top: 0; bottom: 0; }
+  .footer-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 20px 14px 80px; }
+    header { padding: 0 16px; }
+    .progress-hero { padding: 20px; gap: 20px; }
+    .stats-row { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">RW</div>
+    <div>
+      <div class="header-name">RW Performance</div>
+      <div class="header-sub">Implantação Kommo CRM</div>
+    </div>
+  </div>
+  <div class="header-save">
+    <div class="save-dot"></div>
+    <span id="save-label">salvo automaticamente</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- CLIENT BAR -->
+  <div class="client-bar">
+    <label>Cliente</label>
+    <div class="client-select-wrap">
+      <select id="client-select" onchange="switchClient()"></select>
+    </div>
+    <button class="btn-add" onclick="openModal()">
+      <span style="font-size:16px;line-height:1">+</span> Novo cliente
+    </button>
+  </div>
+
+  <!-- HERO -->
+  <div class="progress-hero">
+    <div class="pct-circle">
+      <svg width="88" height="88" viewBox="0 0 88 88">
+        <circle cx="44" cy="44" r="36" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
+        <circle id="arc" cx="44" cy="44" r="36" fill="none" stroke="#1D9E75" stroke-width="7"
+          stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2"
+          style="transition: stroke-dashoffset 0.5s ease"/>
+      </svg>
+      <div class="pct-circle-text">
+        <div class="pct-num" id="hero-pct">0</div>
+        <div class="pct-sym">%</div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-client" id="hero-client">—</div>
+      <div class="hero-sub" id="hero-sub">Nenhuma etapa concluída</div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-num" id="s-done">0</div>
+          <div class="stat-lbl">concluídas</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="s-pend">0</div>
+          <div class="stat-lbl">pendentes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="s-total">0</div>
+          <div class="stat-lbl">total</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCKS -->
+  <div id="blocks-body"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <h3>Novo cliente</h3>
+    <input type="text" id="new-client-input" placeholder="Nome do cliente" onkeydown="if(event.key==='Enter')confirmAdd()">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmAdd()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"></div>
+  <div class="footer-text">reswedigital.com.br &nbsp;|&nbsp; atendimento@reswedigital.com.br &nbsp;|&nbsp; @rw.performance</div>
+</footer>
+
+<script>
+const BLOCKS = [
+  { id: "onboarding", title: "Onboarding", icon: "🚀", bg: "#EEF2FF",
+    items: [
+      { id: "apresentacao", label: "Apresentação da plataforma" },
+      { id: "conta", label: "Criação da conta Kommo — teste de 30 dias" },
+    ]
+  },
+  { id: "estrutura", title: "Estrutura do CRM", icon: "🏗️", bg: "#FFF7ED",
+    items: [
+      { id: "funis", label: "Criação dos funis de clientes — colunas", note: "Junto ao cliente: jornada do cliente" },
+      { id: "detalhes", label: "Criação dos detalhes do lead", note: "Junto ao cliente: definição de ICP" },
+      { id: "etiquetas", label: "Criação de etiquetas de uso", note: "Junto ao cliente: filtros para dashboard" },
+    ]
+  },
+  { id: "automacoes", title: "Automações", icon: "⚙️", bg: "#F0FDF4",
+    items: [
+      { id: "automacao_col", label: "Automações de colunas" },
+      { id: "automacao_nut", label: "Automação de nutrição", note: "Aguardando material do marketing" },
+      { id: "funil_disp", label: "Funil de disparo" },
+    ]
+  },
+  { id: "integracoes", title: "Integrações & API", icon: "🔌", bg: "#FDF4FF",
+    items: [
+      { id: "api", label: "Criação de API", note: "Credenciais e endpoints Kommo API v4" },
+    ]
+  },
+  { id: "inteligencia", title: "Inteligência & IA", icon: "🤖", bg: "#EFF6FF",
+    items: [
+      { id: "sdr", label: "SDR automático", note: "Agente de prospecção automatizada" },
+      { id: "ia", label: "Construção de IA", note: "Desenvolvimento e integração do agente de IA" },
+    ]
+  },
+  { id: "treinamento", title: "Treinamento", icon: "🎓", bg: "#FFFBEB",
+    items: [
+      { id: "trein", label: "Treinamento em cada parte implantada", note: "Realizar ao concluir cada bloco" },
+    ]
+  },
+  { id: "operacao", title: "Operação Comercial", icon: "📋", bg: "#FFF1F2",
+    items: [
+      { id: "rotina", label: "Rotina comercial", note: "Definição e alinhamento com o cliente" },
+      { id: "rmr", label: "RMR — modelo", note: "Entrega e configuração do modelo de receita recorrente" },
+    ]
+  },
+  { id: "resultado", title: "Resultado", icon: "📊", bg: "#F0FDF4",
+    items: [
+      { id: "dashboard", label: "Dashboard" },
+    ]
+  },
+];
+
+const TOTAL = BLOCKS.reduce((a, b) => a + b.items.length, 0);
+const DEFAULT_CLIENTS = [
+  "Sammy Gelados","Open Quality","Lilaliz","Djolle","Leo Motos",
+  "Zjoias","Zoe Vitta","O Boleiro","Matuto","Siarte","UseRad",
+  "Digital Ótica","Take Saúde","Menina Bonita","Aurora Flores",
+  "Bosque Tê","Effetivo","Gorilla"
+];
+
+const openBlocks = {};
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem('kommo_checklist') || '{}');
+  } catch(e) { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem('kommo_checklist', JSON.stringify(data));
+  const now = new Date();
+  document.getElementById('save-label').textContent =
+    'salvo às ' + now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function loadClients() {
+  try {
+    const c = JSON.parse(localStorage.getItem('kommo_clients') || 'null');
+    return c || [...DEFAULT_CLIENTS];
+  } catch(e) { return [...DEFAULT_CLIENTS]; }
+}
+
+function saveClients(list) {
+  localStorage.setItem('kommo_clients', JSON.stringify(list));
+}
+
+let data = loadData();
+let clients = loadClients();
+let currentClient = clients[0];
+
+function buildSelect() {
+  const sel = document.getElementById('client-select');
+  sel.innerHTML = '';
+  clients.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    if (c === currentClient) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function switchClient() {
+  currentClient = document.getElementById('client-select').value;
+  render();
+}
+
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('new-client-input').focus(), 50);
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('new-client-input').value = '';
+  }
+}
+
+function confirmAdd() {
+  const val = document.getElementById('new-client-input').value.trim();
+  if (!val) return;
+  if (!clients.includes(val)) {
+    clients.push(val);
+    saveClients(clients);
+  }
+  currentClient = val;
+  buildSelect();
+  render();
+  closeModal();
+}
+
+function toggleItem(stepId) {
+  if (!data[currentClient]) data[currentClient] = {};
+  data[currentClient][stepId] = !data[currentClient][stepId];
+  saveData(data);
+  render();
+}
+
+function toggleBlock(blockId) {
+  openBlocks[blockId] = !openBlocks[blockId];
+  render();
+}
+
+function render() {
+  const cs = data[currentClient] || {};
+  const done = Object.values(cs).filter(Boolean).length;
+  const pct = Math.round((done / TOTAL) * 100);
+  const circ = 226.2;
+
+  document.getElementById('hero-pct').textContent = pct;
+  document.getElementById('arc').style.strokeDashoffset = circ - (circ * pct / 100);
+  document.getElementById('hero-client').textContent = currentClient;
+  document.getElementById('hero-sub').textContent = done === TOTAL
+    ? '✓ Implantação concluída!'
+    : done === 0 ? 'Nenhuma etapa concluída'
+    : done + ' de ' + TOTAL + ' etapas concluídas';
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-pend').textContent = TOTAL - done;
+  document.getElementById('s-total').textContent = TOTAL;
+
+  let html = '';
+  for (const block of BLOCKS) {
+    const blockDone = block.items.filter(i => cs[i.id]).length;
+    const blockTotal = block.items.length;
+    const blockPct = Math.round((blockDone / blockTotal) * 100);
+    const isOpen = !!openBlocks[block.id];
+
+    html += `<div class="block">
+      <div class="block-header" onclick="toggleBlock('${block.id}')">
+        <div class="block-icon" style="background:${block.bg}">${block.icon}</div>
+        <div class="block-info">
+          <div class="block-title">${block.title}</div>
+          <div class="block-count">${blockDone} de ${blockTotal} etapas</div>
+        </div>
+        <div class="block-right">
+          <div class="mini-bar-wrap">
+            <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${blockPct}%"></div></div>
+          </div>
+          <span class="block-pct ${blockPct===0?'zero':''}">${blockPct}%</span>
+          <span class="chevron ${isOpen?'open':''}">▶</span>
+        </div>
+      </div>
+      <div class="block-items ${isOpen?'open':''}">`;
+
+    for (const item of block.items) {
+      const isDone = !!cs[item.id];
+      html += `<div class="check-item ${isDone?'done':''}" onclick="toggleItem('${item.id}')">
+        <div class="check-box">
+          <svg class="checkmark" width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="item-label">${item.label}</div>
+          ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    html += `</div></div>`;
+  }
+
+  document.getElementById('blocks-body').innerHTML = html;
+  buildSelect();
+}
+
+render();
+</script>
+</body>
+</html>
