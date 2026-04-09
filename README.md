@@ -1,2 +1,0 @@
-# implantacao
-implantação kommo
